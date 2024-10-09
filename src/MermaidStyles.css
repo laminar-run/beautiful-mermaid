@@ -17,6 +17,11 @@
     --font-weight: 600;
     --border-radius: 8px;
     --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* New Variables */
+    --highlight-color: #FF5733;
+    --tooltip-background: rgba(0, 0, 0, 0.75);
+    --tooltip-text-color: #FFFFFF;
+    --transition-duration: 0.3s;
 }
 
 /* Global SVG Styles */
@@ -37,12 +42,36 @@ svg {
     rx: var(--border-radius);
     ry: var(--border-radius);
     filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.06));
+    transition: fill var(--transition-duration), stroke var(--transition-duration);
 }
 
-.node foreignObject {
-    overflow: visible;
+.node:hover rect,
+.node:hover circle,
+.node:hover ellipse,
+.node:hover polygon,
+.node:hover path {
+    fill: var(--secondary-color);
+    stroke: var(--primary-color);
 }
 
+/* Tooltip Styles */
+.tooltip {
+    position: absolute;
+    background-color: var(--tooltip-background);
+    color: var(--tooltip-text-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: var(--font-size);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-duration);
+}
+
+.node:hover .tooltip {
+    opacity: 1;
+}
+
+/* Node Label Styles */
 .nodeLabel {
     display: flex;
     align-items: center;
@@ -67,6 +96,11 @@ svg {
     stroke: var(--edge-color);
     stroke-width: var(--edge-stroke-width);
     fill: none;
+    transition: stroke var(--transition-duration);
+}
+
+.edgePath:hover .path {
+    stroke: var(--highlight-color);
 }
 
 .edgeLabel {
@@ -94,7 +128,12 @@ svg {
     text-anchor: middle;
     dominant-baseline: text-before-edge;
     dy: -1.2em;
-    /* Position the title above the cluster */
+}
+
+/* Cluster Label Interaction */
+.cluster:hover rect {
+    fill: var(--secondary-color);
+    stroke: var(--primary-color);
 }
 
 .clusterLabel {
@@ -138,6 +177,23 @@ svg {
     stroke-width: 2px;
 }
 
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.node,
+.edgePath,
+.cluster {
+    animation: fadeIn 0.5s ease-in;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     :root {
@@ -157,4 +213,13 @@ svg {
     .cluster text {
         font-size: calc(var(--font-size) + 1px);
     }
+}
+
+/* New Styles for Improved Accessibility */
+.nodeLabel span {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.edgeLabel {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
