@@ -1,0 +1,160 @@
+/* CSS Variables for Customization */
+:root {
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    --primary-color: #3B82F6;
+    --secondary-color: #10B981;
+    --background-color: #F8FAFC;
+    --node-fill: #FFFFFF;
+    --node-stroke: #E2E8F0;
+    --node-text-color: #1E293B;
+    --cluster-fill: #EFF6FF;
+    --cluster-stroke: #BFDBFE;
+    --cluster-text-color: #2563EB;
+    --edge-color: #94A3B8;
+    --edge-stroke-width: 1.5px;
+    --node-stroke-width: 1.5px;
+    --font-size: 14px;
+    --font-weight: 600;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Global SVG Styles */
+svg {
+    background-color: var(--background-color);
+    font-family: var(--font-family);
+}
+
+/* Node Styles */
+.node rect,
+.node circle,
+.node ellipse,
+.node polygon,
+.node path {
+    stroke-width: var(--node-stroke-width);
+    stroke: var(--node-stroke);
+    fill: var(--node-fill);
+    rx: var(--border-radius);
+    ry: var(--border-radius);
+    filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.06));
+}
+
+.node foreignObject {
+    overflow: visible;
+}
+
+.nodeLabel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+}
+
+.nodeLabel i {
+    margin-right: 6px;
+    font-size: calc(var(--font-size) + 2px);
+    color: var(--primary-color);
+}
+
+.nodeLabel span {
+    font-size: var(--font-size);
+    font-weight: var(--font-weight);
+    color: var(--node-text-color);
+}
+
+/* Edge Styles */
+.edgePath .path {
+    stroke: var(--edge-color);
+    stroke-width: var(--edge-stroke-width);
+    fill: none;
+}
+
+.edgeLabel {
+    font-size: calc(var(--font-size) - 1px);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: var(--font-weight);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Cluster Styles */
+.cluster rect {
+    fill: var(--cluster-fill);
+    stroke: var(--cluster-stroke);
+    stroke-width: var(--node-stroke-width);
+    rx: calc(var(--border-radius) * 1.5);
+    ry: calc(var(--border-radius) * 1.5);
+}
+
+.cluster text.label {
+    fill: var(--cluster-text-color);
+    font-size: calc(var(--font-size) + 4px);
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: text-before-edge;
+    dy: -1.2em;
+    /* Position the title above the cluster */
+}
+
+.clusterLabel {
+    pointer-events: none;
+}
+
+.cluster {
+    overflow: visible;
+}
+
+/* System-specific styles */
+#Legacy_Systems rect {
+    fill: #FFF4E6;
+}
+
+#Modern_Systems rect {
+    fill: #E6F4FF;
+}
+
+#AI_BI_Systems rect {
+    fill: #F3E8FF;
+}
+
+#Laminar_Platform rect {
+    fill: #EBF8FF;
+    stroke: #3182CE;
+    stroke-width: 2px;
+    rx: 12px;
+    ry: 12px;
+}
+
+#Protocols_Connectors rect {
+    fill: #BEE3F8;
+    rx: 10px;
+    ry: 10px;
+}
+
+#Integration_Workflows rect {
+    fill: #90CDF4;
+    stroke: #3182CE;
+    stroke-width: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    :root {
+        --font-size: 12px;
+        --border-radius: 6px;
+    }
+
+    .edgeLabel {
+        font-size: calc(var(--font-size) - 1px);
+        padding: 2px 4px;
+    }
+
+    .nodeLabel i {
+        font-size: calc(var(--font-size) + 1px);
+    }
+
+    .cluster text {
+        font-size: calc(var(--font-size) + 1px);
+    }
+}
