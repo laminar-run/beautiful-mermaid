@@ -2,6 +2,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import Editor from '@monaco-editor/react';
 import mermaid from 'mermaid/dist/mermaid.esm.mjs';
 import React, { useCallback, useEffect, useState } from 'react';
+import svgPanZoom from 'svg-pan-zoom';
 import './MermaidStyles.css';
 import { getAllThemes, getTheme } from './communityThemes';
 import { initialMermaid } from './initial-mermaid';
@@ -30,6 +31,26 @@ export default function App() {
   const [mermaidConfig, setMermaidConfig] = useState(initialMermaidConfig);
 
   useEffect(() => {
+    if (svgOutput) {
+      // Wait for the SVG to be rendered in the DOM
+      const timer = setTimeout(() => {
+        const svgElement = document.querySelector('#diagram-container svg');
+        if (svgElement) {
+          svgPanZoom(svgElement, {
+            controlIconsEnabled: true,
+            zoomEnabled: true,
+            panEnabled: true,
+            fit: true,
+            center: true,
+          });
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [svgOutput]);
+
+  useEffect(() => {
     const communityThemeNames = getAllThemes();
     setAvailableThemes([
       ...defaultThemes,
@@ -42,9 +63,33 @@ export default function App() {
 
   const renderDiagram = useCallback(async () => {
     try {
+      // Replace icons with Unicode characters or inline SVG (we'll handle this in Issue 2)
+      const processedScript = replaceIcons(mermaidScript);
+
       mermaid.initialize(mermaidConfig);
-      const { svg } = await mermaid.render('mermaid-diagram', mermaidScript);
-      setSvgOutput(svg);
+      const { svg } = await mermaid.render('mermaid-diagram', processedScript);
+
+      // Parse the SVG and modify it
+      const parser = new DOMParser();
+      const svgDoc = parser.parseFromString(svg, 'image/svg+xml');
+      const svgElement = svgDoc.documentElement;
+
+      // Remove width and height attributes
+      svgElement.removeAttribute('width');
+      svgElement.removeAttribute('height');
+
+      // Add viewBox attribute if not present
+      if (!svgElement.hasAttribute('viewBox')) {
+        const width = svgElement.getAttribute('width') || '1000';
+        const height = svgElement.getAttribute('height') || '1000';
+        svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      }
+
+      // Serialize the SVG back to a string
+      const serializer = new XMLSerializer();
+      const responsiveSvg = serializer.serializeToString(svgElement);
+
+      setSvgOutput(responsiveSvg);
     } catch (error) {
       console.error('Mermaid rendering failed:', error);
       setSvgOutput('');
@@ -94,6 +139,28 @@ export default function App() {
 
   const toggleFullscreen = () => {
     setFullscreen(!fullscreen);
+  };
+
+  const replaceIcons = (script) => {
+    return script
+      .replace(/<i class='fas fa-server'><\/i>/g, '🖥️')
+      .replace(/<i class='fas fa-cogs'><\/i>/g, '⚙️')
+      .replace(/<i class='fas fa-database'><\/i>/g, '🗄️')
+      .replace(/<i class='fas fa-industry'><\/i>/g, '🏭')
+      .replace(/<i class='fas fa-exchange-alt'><\/i>/g, '🔄')
+      .replace(/<i class='fas fa-globe'><\/i>/g, '🌐')
+      .replace(/<i class='fas fa-plug'><\/i>/g, '🔌')
+      .replace(/<i class='fas fa-code'><\/i>/g, '💻')
+      .replace(/<i class='fas fa-project-diagram'><\/i>/g, '📊')
+      .replace(/<i class='fas fa-network-wired'><\/i>/g, '🌐')
+      .replace(/<i class='fas fa-window-maximize'><\/i>/g, '🖥️')
+      .replace(/<i class='fas fa-mobile-alt'><\/i>/g, '📱')
+      .replace(/<i class='fas fa-cubes'><\/i>/g, '📦')
+      .replace(/<i class='fas fa-database'><\/i>/g, '🗄️')
+      .replace(/<i class='fas fa-brain'><\/i>/g, '🧠')
+      .replace(/<i class='fas fa-cog'><\/i>/g, '⚙️')
+      .replace(/<i class='fas fa-chart-line'><\/i>/g, '📈')
+      .replace(/<i class='fas fa-chart-bar'><\/i>/g, '📊');
   };
 
   return (
@@ -155,7 +222,7 @@ export default function App() {
             <div className="w-full lg:w-1/2">
               <div className="relative h-[calc(100vh-300px)] border-2 border-gray-200 rounded-lg p-4">
                 <div
-                  className={`relative w-full h-full flex items-center justify-center overflow-auto ${fullscreen ? 'fixed inset-0 z-50 bg-white p-8' : ''
+                  className={`relative w-full h-full overflow-auto ${fullscreen ? 'fixed inset-0 z-50 bg-white p-8' : ''
                     }`}
                 >
                   <div
