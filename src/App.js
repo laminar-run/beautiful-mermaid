@@ -2,11 +2,10 @@ import '@fortawesome/fontawesome-free/css/all.min.css'; // Import Font Awesome C
 import mermaid from 'mermaid';
 import React, { useEffect, useState } from 'react';
 
-// Mermaid configuration
 mermaid.initialize({
   startOnLoad: false,
   theme: 'base',
-  securityLevel: 'loose', // Needed for inline styles and Font Awesome icons
+  securityLevel: 'loose',
   themeVariables: {
     fontFamily: 'Open Sans, Arial, sans-serif',
     primaryColor: '#1E90FF',
@@ -21,8 +20,8 @@ mermaid.initialize({
 });
 
 const customStyles = `
-  /* CSS Variables for Customization */
-  
+/* CSS Variables for Customization */
+:root {
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
   --primary-color: #3B82F6;
   --secondary-color: #10B981;
@@ -37,9 +36,9 @@ const customStyles = `
   --edge-stroke-width: 1.5px;
   --node-stroke-width: 1.5px;
   --font-size: 14px;
-  --font-weight: 500;
+  --font-weight: 600;
   --border-radius: 8px;
-  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 /* Global SVG Styles */
@@ -49,30 +48,40 @@ svg {
 }
 
 /* Node Styles */
-.node rect, .node circle, .node ellipse, .node polygon, .node path {
+.node rect,
+.node circle,
+.node ellipse,
+.node polygon,
+.node path {
   stroke-width: var(--node-stroke-width);
   stroke: var(--node-stroke);
   fill: var(--node-fill);
   rx: var(--border-radius);
   ry: var(--border-radius);
   filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.06));
-  transition: all 0.3s ease;
 }
 
-.node:hover rect, .node:hover circle, .node:hover ellipse, .node:hover polygon, .node:hover path {
-  filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.1));
-  transform: translateY(-1px);
+.node foreignObject {
+  overflow: visible;
 }
 
-.node text {
-  fill: var(--node-text-color);
+.nodeLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+}
+
+.nodeLabel i {
+  margin-right: 6px;
+  font-size: calc(var(--font-size) + 2px);
+  color: var(--primary-color);
+}
+
+.nodeLabel span {
   font-size: var(--font-size);
   font-weight: var(--font-weight);
-}
-
-.node .fa, .node .fas {
-  font-size: calc(var(--font-size) + 2px);
-  margin-right: 6px;
+  color: var(--node-text-color);
 }
 
 /* Edge Styles */
@@ -80,12 +89,6 @@ svg {
   stroke: var(--edge-color);
   stroke-width: var(--edge-stroke-width);
   fill: none;
-  stroke-dasharray: 4, 4;
-  animation: dashdraw 30s linear infinite;
-}
-
-@keyframes dashdraw {
-  to { stroke-dashoffset: 200; }
 }
 
 .edgeLabel {
@@ -104,19 +107,37 @@ svg {
   stroke-width: var(--node-stroke-width);
   rx: calc(var(--border-radius) * 1.5);
   ry: calc(var(--border-radius) * 1.5);
-  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.04));
 }
 
-.cluster text {
-  font-size: calc(var(--font-size) + 1px);
-  font-weight: 600;
+.cluster text.label {
   fill: var(--cluster-text-color);
+  font-size: calc(var(--font-size) + 4px);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: text-before-edge;
+  dy: -1.2em; /* Position the title above the cluster */
+}
+
+.clusterLabel {
+  pointer-events: none;
+}
+
+.cluster {
+  overflow: visible;
 }
 
 /* System-specific styles */
-#Legacy_Systems rect { fill: #FFF4E6; }
-#Modern_Systems rect { fill: #E6F4FF; }
-#AI_BI_Systems rect { fill: #F3E8FF; }
+#Legacy_Systems rect {
+  fill: #FFF4E6;
+}
+
+#Modern_Systems rect {
+  fill: #E6F4FF;
+}
+
+#AI_BI_Systems rect {
+  fill: #F3E8FF;
+}
 
 #Laminar_Platform rect {
   fill: #EBF8FF;
@@ -138,86 +159,25 @@ svg {
   stroke-width: 2px;
 }
 
-/* Icon colors */
-.node .fa-server, .node .fa-cogs, .node .fa-database, .node .fa-industry { color: #ED8936; }
-.node .fa-exchange-alt, .node .fa-globe, .node .fa-plug, .node .fa-code { color: #3182CE; }
-.node .fa-project-diagram { color: #2B6CB0; }
-.node .fa-network-wired, .node .fa-window-maximize, .node .fa-mobile-alt, .node .fa-cubes { color: #2C7A7B; }
-.node .fa-brain, .node .fa-cog, .node .fa-chart-line, .node .fa-chart-bar { color: #805AD5; }
-
 /* Responsive Design */
 @media (max-width: 768px) {
   :root {
     --font-size: 12px;
     --border-radius: 6px;
   }
-  
+
   .edgeLabel {
     font-size: calc(var(--font-size) - 1px);
     padding: 2px 4px;
   }
 
-  .node .fa, .node .fas {
+  .nodeLabel i {
     font-size: calc(var(--font-size) + 1px);
   }
-}
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-svg * {
-  animation: fadeIn 0.5s ease-out;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-color: #1F2937;
-    --node-fill: #374151;
-    --node-stroke: #4B5563;
-    --node-text-color: #F9FAFB;
-    --cluster-fill: #1E3A8A;
-    --cluster-stroke: #2563EB;
-    --cluster-text-color: #BFDBFE;
-    --edge-color: #9CA3AF;
+  .cluster text {
+    font-size: calc(var(--font-size) + 1px);
   }
-  
-  .edgeLabel {
-    background-color: rgba(55, 65, 81, 0.8);
-    color: #F9FAFB;
-  }
-
-  #Legacy_Systems rect { fill: #4A3113; }
-  #Modern_Systems rect { fill: #1E3A5F; }
-  #AI_BI_Systems rect { fill: #3B1659; }
-
-  #Laminar_Platform rect {
-    fill: #1E3A8A;
-    stroke: #60A5FA;
-  }
-
-  #Protocols_Connectors rect {
-    fill: #1E40AF;
-  }
-
-  #Integration_Workflows rect {
-    fill: #2563EB;
-    stroke: #60A5FA;
-  }
-}
-
-/* Additional styles for better visibility */
-.node foreignObject {
-  overflow: visible;
-}
-
-#title-text {
-  font-size: 24px;
-  font-weight: 700;
-  fill: var(--cluster-text-color);
 }
 `;
 
